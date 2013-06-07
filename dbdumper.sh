@@ -26,6 +26,7 @@ DBS=
 DBS_TO_DUMP=
 DBS_TO_IGNORE="information_schema"
 DRYRUN=
+FILENAME_TIMESTAMP=
 HOST="localhost"
 PATH_TO_SAVE=
 TABLES=
@@ -45,6 +46,7 @@ OPTIONS:
   -b  compress the dumps with bzip2
   -d  space separated list of database name(s) (defaults to all databases, wildcards allowed)
   -D  space separated list of database name(s) to ignore (wildcards allowed)
+  -f  adds timestamp to the filename
   -H  database host (defaults to "localhost")
   -p  save path of the dumps; if not set, dumps will be pushed to STDOUT
   -t  not yet implemented: space separated list of table name(s) (defaults to all tables, wildcards allowed)
@@ -100,7 +102,12 @@ function getCompressCommand()
 
 function getFileName()
 {
-	local filename="${PATH_TO_SAVE}/${1}_`date +%Y%m%d_%H%M%S`"
+	local filename="${PATH_TO_SAVE}/${1}"
+
+	case ${FILENAME_TIMESTAMP}
+	in
+		1) filename="${filename}_`date +%Y%m%d_%H%M%S`";;
+	esac
 
 	case ${VENDOR}
 	in
@@ -164,13 +171,14 @@ function options()
 		exit 0
 	fi
 
-	while getopts "bd:D:hH:p:t:u:v:V\?" OPTION
+	while getopts "bd:D:fhH:p:t:u:v:V\?" OPTION
 	do
 		case ${OPTION}
 		in
 			b) BZIP2=1;;
 			d) DBS=${OPTARG};;
 			D) DBS_TO_IGNORE="${DBS_TO_IGNORE} ${OPTARG}";;
+			f) FILENAME_TIMESTAMP=1;;
 			H) HOST=${OPTARG};;
 			p) PATH_TO_SAVE=${OPTARG};;
 			t) TABLES=${OPTARG};;
