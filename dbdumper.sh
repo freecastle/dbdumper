@@ -24,7 +24,7 @@
 BZIP2=
 DBS=
 DBS_TO_DUMP=
-DBS_TO_IGNORE="information_schema"
+DBS_TO_IGNORE="information_schema performance_schema"
 DRYRUN=
 FILENAME_TIMESTAMP=
 HOST="localhost"
@@ -44,7 +44,7 @@ Script to dump SQL databases
 
 OPTIONS:
   -b  compress the output with bzip2
-  -d  space separated list of database name(s) (defaults to all databases, wildcards allowed)
+  -d  space separated list of database name(s) (defaults to all databases)
   -D  space separated list of database name(s) to ignore (wildcards allowed)
   -f  adds timestamp to the filename
   -H  database host (defaults to "localhost")

@@ -45,7 +45,7 @@ Options
 =======
 
 *   ```-b``` compress the output with bzip2
-*   ```-d``` space separated list of database name(s) (defaults to all databases, wildcards allowed)
+*   ```-d``` space separated list of database name(s) (defaults to all databases)
 *   ```-D``` space separated list of database name(s) to ignore (wildcards allowed)
 *   ```-f``` adds timestamp to the filename
 *   ```-H``` database host (defaults to "localhost")
