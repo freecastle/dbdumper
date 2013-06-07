@@ -1,7 +1,4 @@
-#!/bin/bash -e
-
-###
-# The MIT License (MIT)
+#!/usr/bin/env bash
 #
 # Copyright (c) 2013 Fabian Freiburg
 #
@@ -24,10 +21,23 @@
 # THE SOFTWARE.
 ###
 
-usage()
+BZIP2=
+DBS=
+DBS_TO_DUMP=
+DBS_TO_IGNORE="information_schema"
+DRYRUN=
+HOST="localhost"
+PATH_TO_SAVE=
+TABLES=
+TABLES_TO_DUMP=
+TABLES_TO_IGNORE=
+USER=`whoami`
+VENDOR="mysql"
+
+function usage()
 {
 	cat << EOF
-usage: $0 options
+usage: ${0} options
 
 Script to dump SQL databases
 
@@ -46,7 +56,7 @@ OPTIONS:
 EOF
 }
 
-getDatabasesFromHost()
+function getDatabasesFromHost()
 {
 	case ${VENDOR}
 	in
@@ -55,7 +65,7 @@ getDatabasesFromHost()
 	esac
 }
 
-getDatabasesToDump()
+function getDatabasesToDump()
 {
 	local db
 
@@ -80,7 +90,7 @@ getDatabasesToDump()
 	done
 }
 
-getCompressCommand()
+function getCompressCommand()
 {
 	case ${BZIP2}
 	in
@@ -88,7 +98,7 @@ getCompressCommand()
 	esac
 }
 
-getFileName()
+function getFileName()
 {
 	local filename="${PATH_TO_SAVE}/${1}_`date +%Y%m%d_%H%M%S`"
 
@@ -106,7 +116,7 @@ getFileName()
 	echo ${filename}
 }
 
-getOut()
+function getOut()
 {
 	if [[ -n ${PATH_TO_SAVE} ]]
 	then
@@ -114,7 +124,7 @@ getOut()
 	fi
 }
 
-dumpDb()
+function dumpDb()
 {
 	local cmd
 
@@ -136,7 +146,7 @@ dumpDb()
 	fi
 }
 
-dumpDbs()
+function dumpDbs()
 {
 	local db
 
@@ -146,7 +156,48 @@ dumpDbs()
 	done
 }
 
-init()
+function options()
+{
+	if [ ${#} -eq 0 ]
+	then
+		usage
+		exit 0
+	fi
+
+	while getopts "bd:D:hH:p:t:u:v:V\?" OPTION
+	do
+		case ${OPTION}
+		in
+			b) BZIP2=1;;
+			d) DBS=${OPTARG};;
+			D) DBS_TO_IGNORE="${DBS_TO_IGNORE} ${OPTARG}";;
+			H) HOST=${OPTARG};;
+			p) PATH_TO_SAVE=${OPTARG};;
+			t) TABLES=${OPTARG};;
+			u) USER=${OPTARG};;
+			v)
+				if [[ "mysql pgsql" =~ ${OPTARG} ]]
+				then
+					VENDOR=${OPTARG}
+				else
+					usage
+					exit
+				fi
+				;;
+			V) DRYRUN=1;;
+			h)
+				usage
+				exit
+				;;
+			*)
+				usage
+				exit
+				;;
+		esac
+	done
+}
+
+function main()
 {
 	if [[ -z ${DBS} ]]
 	then
@@ -163,45 +214,5 @@ init()
 	dumpDbs
 }
 
-BZIP2=
-DBS=
-DBS_TO_DUMP=
-DBS_TO_IGNORE="information_schema"
-DRYRUN=
-HOST="localhost"
-PATH_TO_SAVE=
-TABLES=
-TABLES_TO_DUMP=
-TABLES_TO_IGNORE=
-USER=`whoami`
-VENDOR="mysql"
-
-while getopts "bd:D:hH:p:t:u:v:V\?" OPTION
-do
-	case ${OPTION}
-	in
-		b) BZIP2=1;;
-		d) DBS=${OPTARG};;
-		D) DBS_TO_IGNORE="${DBS_TO_IGNORE} ${OPTARG}";;
-		H) HOST=${OPTARG};;
-		p) PATH_TO_SAVE=${OPTARG};;
-		t) TABLES=${OPTARG};;
-		u) USER=${OPTARG};;
-		v)
-			if [[ "mysql pgsql" =~ ${OPTARG} ]]
-			then
-				VENDOR=${OPTARG}
-			else
-				usage
-				exit
-			fi
-			;;
-		V) DRYRUN=1;;
-		h)
-			usage
-			exit
-			;;
-	esac
-done
-
-init
+options ${@}
+main
