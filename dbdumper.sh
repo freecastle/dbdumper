@@ -43,7 +43,7 @@ usage: ${0} options
 Script to dump SQL databases
 
 OPTIONS:
-  -b  compress the dumps with bzip2
+  -b  compress the output with bzip2
   -d  space separated list of database name(s) (defaults to all databases, wildcards allowed)
   -D  space separated list of database name(s) to ignore (wildcards allowed)
   -f  adds timestamp to the filename
