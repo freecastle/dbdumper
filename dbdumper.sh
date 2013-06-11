@@ -222,5 +222,5 @@ function main()
 	dumpDbs
 }
 
-options ${@}
+options "${@}"
 main
